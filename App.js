@@ -5,6 +5,8 @@ import {
   StyleSheet,
   View,
   Dimensions,
+  Vibration,
+  Text,
 } from 'react-native';
 
 import Ball from './components/Ball';
@@ -15,6 +17,7 @@ import Emoji from './components/Emoji';
 import Score from './components/Score';
 
 import Vector from './utils/Vector';
+import AsyncStorage from '@react-native-community/async-storage';
 
 // physical variables
 const gravity = 0.6; // gravity
@@ -60,11 +63,13 @@ class Basketball extends Component {
       lifecycle: LC_WAITING,
       scored: null,
       score: 0,
+      highScore: 0
     };
   }
 
   componentDidMount() {
     this.interval = setInterval(this.update.bind(this), 1000 / 60);
+    this.getValue()
   }
 
   componentWillUnmount() {
@@ -219,6 +224,7 @@ class Basketball extends Component {
         if (nextState.x + radius > NET_LEFT_BORDER_X && nextState.x + radius < NET_RIGHT_BORDER_X) {
           nextState.scored = true;
           nextState.score += 1;
+          this.setValue()
         } else {
           nextState.scored = false;
         }
@@ -286,6 +292,30 @@ class Basketball extends Component {
     }
   }
 
+  makeVibration() {
+    Vibration.vibrate([100]);
+  }
+
+  getValue = async () => {
+    try {
+      const value = await AsyncStorage.getItem("HIGH_SCORE")
+      this.setState({ highScore: value })
+    }
+    catch(e) {
+      console.log("getValue", e)
+    }
+  }
+
+  setValue = async () => {
+    try {
+      this.state.score > this.state.highScore && AsyncStorage.setItem("HIGH_SCORE", score.toString())
+    }
+    catch(e) {
+      console.log("setValue", e)
+      AsyncStorage.setItem("HIGH_SCORE", score.toString())
+    }
+  }
+
   update() {
     if (this.state.lifecycle === LC_WAITING) return;
 
@@ -324,9 +354,16 @@ class Basketball extends Component {
     return null;
   }
 
+  componentDidUpdate() {
+    this.state.scored === true && this.makeVibration()
+  }
+
   render() {
     return (
       <View style={styles.container}>
+        <View style={styles.score}>
+          <Text style={{ fontSize: 60 }}>{this.state.highScore} </Text>
+        </View>
         <Score y={FLOOR_HEIGHT * 3} score={this.state.score} scored={this.state.scored} />
         <Hoop y={HOOP_Y} />
         {this.renderNet(this.state.lifecycle === LC_STARTING)}
@@ -351,6 +388,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  score: {
+    position: "absolute",
+    top: "50%",
+    right: "50%",
+    zIndex: 1
+  }
 });
 
 export default Basketball;
