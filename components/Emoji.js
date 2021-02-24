@@ -45,22 +45,22 @@ class Emoji extends Component {
 
       Animated.timing(
         this.state.fadeAnim,
-        {toValue: 1}
+        {toValue: 1, useNativeDriver: false}
       ).start();
 
       Animated.timing(
         this.state.relativeY,
-        {toValue: 15}
+        {toValue: 15, useNativeDriver: true}
       ).start();
     } else if (nextProps.scored === null && this.props.scored !== null) {
       Animated.timing(
         this.state.fadeAnim,
-        {toValue: 0}
+        {toValue: 0, useNativeDriver: false}
       ).start();
 
       Animated.timing(
         this.state.relativeY,
-        {toValue: 40}
+        {toValue: 40, useNativeDriver: false}
       ).start();
     }
   }
@@ -90,7 +90,6 @@ class Emoji extends Component {
           backgroundColor: 'transparent',
 
           opacity: this.state.fadeAnim,
-          marginBottom: this.state.relativeY,
         }]}
         >
           {this.state.emoji}
