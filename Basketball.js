@@ -2,21 +2,30 @@ import React, {
   Component,
 } from 'react';
 import {
+  StyleSheet,
+  View,
   Dimensions,
   Vibration,
+  Text,
+  StatusBar,
+  TouchableWithoutFeedback,
+  Image,
+  Alert,
 } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
 
+import Ball from './components/Ball';
+import Hoop from './components/Hoop';
 import Net from './components/Net';
 import Floor from './components/Floor';
+import Emoji from './components/Emoji';
+import Score from './components/Score';
 
 import Vector from './utils/Vector';
 import AsyncStorage from '@react-native-community/async-storage';
-import Settings from './Settings';
-import { NavigationContainer } from '@react-navigation/native';
-import Basketball from './Basketball';
-import MainMenu from './MainMenu';
 import { constants } from './constants';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native';
+import { useEffect } from 'react';
 
 // physical variables
 const gravity = 0.6; // gravity
@@ -26,6 +35,7 @@ const rotationFactor = 10; // ball rotation factor
 // components sizes and positions
 const FLOOR_HEIGHT = 48;
 const FLOOR_Y = 11;
+const HOOP_Y = Dimensions.get('window').height - 227;
 const NET_HEIGHT = 6;
 const NET_WIDTH = 83;
 const NET_Y = Dimensions.get('window').height - 216;
@@ -42,8 +52,8 @@ const LC_FALLING = 2;
 const LC_BOUNCING = 3;
 const LC_RESTARTING = 4;
 const LC_RESTARTING_FALLING = 5;
-const Stack = createStackNavigator();
-class App extends Component {
+
+class Basketball extends Component {
 
   constructor(props) {
     super(props);
@@ -92,7 +102,6 @@ class App extends Component {
   }
 
   componentDidUpdate() {
-    this.state.scored === true && this.makeVibration()
   }
 
   componentWillUnmount() {
@@ -247,6 +256,7 @@ class App extends Component {
         if (nextState.x + radius > NET_LEFT_BORDER_X && nextState.x + radius < NET_RIGHT_BORDER_X) {
           nextState.scored = true;
           nextState.score += 1;
+          this.makeVibration()
         } else {
           nextState.scored = false;
         }
@@ -315,7 +325,7 @@ class App extends Component {
   }
 
   makeVibration() {
-    Vibration.vibrate([100]);
+    this.props.vibro && Vibration.vibrate([100]);
   }
 
   
@@ -360,23 +370,65 @@ class App extends Component {
 
   render() {
     return (
-      <NavigationContainer>
-        <Stack.Navigator>
-        <Stack.Screen name="MainMenu" component={MainMenu} options={{
-
-        headerBackTitleVisible: false,
-        height: constants.MAX_HEIGHT * 0.05
-      }} />
-      <Stack.Screen name="Basketball" component={Basketball} options={{
-        headerBackTitleVisible: false,
-        height: constants.MAX_HEIGHT * 0.05,
-        title: "",
-      }} />
-      <Stack.Screen name="Settings" component={Settings} />
-    </Stack.Navigator>
-      </NavigationContainer>
+      <>
+      <View style={styles.container}>
+        <View style={styles.score}>
+          <Text style={{ fontSize: 60 }}>{this.state.highScore} </Text>
+        </View>
+        <Score y={FLOOR_HEIGHT * 3} score={this.state.score} scored={this.state.scored} />
+        <Hoop y={HOOP_Y} />
+        {this.renderNet(this.state.lifecycle === LC_STARTING)}
+        {this.renderFloor(this.state.vy <= 0)}
+        <Ball
+          onStart={this.onStart.bind(this)}
+          x={this.state.x}
+          y={this.state.y}
+          radius={radius}
+          rotate={this.state.rotate}
+          scale={this.state.scale}
+        />
+        {this.renderNet(this.state.lifecycle !== LC_STARTING)}
+        {this.renderFloor(this.state.vy > 0)}
+        <Emoji y={NET_Y} scored={this.state.scored} />
+        <StatusBar hidden={true}/>
+      </View>
+      </>
     );
   }
 }
+function App({route}) {
+  useEffect(() => {
+    console.log(route)
+  })
+  const navigation = useNavigation()
+  return (
+    <Basketball navigation={navigation} vibro={route.params.vibro} />
+  )
+}
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  score: {
+    position: "absolute",
+    top: "50%",
+    right: "50%",
+    zIndex: 1
+  },
+  iconContainer: {
+    width: constants.MAX_WIDTH * 0.2,
+    height: constants.MAX_WIDTH * 0.2,
+    backgroundColor: "#ccc",
+    position: "absolute",
+    top: constants.MAX_HEIGHT * 0.1,
+    left: constants.MAX_WIDTH * 0.05,
+  },
+  icon: {
+    width: constants.MAX_WIDTH * 0.2,
+    height: constants.MAX_WIDTH * 0.2,
+  }
+});
 
 export default App

@@ -1,22 +1,22 @@
 import { useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native'
-import { MAX_HEIGHT, MAX_WIDTH } from './constants'
+import { constants } from './constants'
 
-export default function StartScreen(props) {
+export default function MainMenu(props) {
   const [vibro, setVibro] = useState(false)
   const navigation = useNavigation()
   return (
     <View style={styles.container} >
       <TouchableOpacity onPress={() => {
-        navigation.navigate("Gamescreen", {
+        props.hideModal && props.hideModal()
+        navigation.navigate("Basketball", {
           vibro,
         })
       }} style={styles.item} >
         <Text style={styles.text} >Start Game</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => {
-        props.hideModal && props.hideModal()
         navigation.navigate("Settings", {
           vibro,
           setVibro
@@ -29,16 +29,16 @@ export default function StartScreen(props) {
 }
 const styles = StyleSheet.create({
   container: {
-    width: MAX_WIDTH,
-    height: MAX_HEIGHT,
+    width: constants.MAX_WIDTH,
+    height: constants.MAX_HEIGHT,
     flex: 1,
-    paddingVertical: MAX_HEIGHT * 0.1,
+    paddingVertical: constants.MAX_HEIGHT * 0.1,
     justifyContent: "space-around",
     alignItems: "center",
     backgroundColor: "#053646",
   },
   item: {
-    width: MAX_WIDTH * 0.9,
+    width: constants.MAX_WIDTH * 0.9,
     marginVertical: 10,
     padding: 10,
     overflow: "hidden",
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     borderRadius: 10
   },
   text: {
-    fontSize: MAX_HEIGHT * 0.05,
+    fontSize: constants.MAX_HEIGHT * 0.05,
     fontWeight: "600",
     textAlign: "center",
     color: "#fff"
