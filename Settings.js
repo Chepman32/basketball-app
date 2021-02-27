@@ -11,30 +11,8 @@ export default function Settings({route}) {
     { label: "On", value: true },
     { label: "Off", value: false },
   ];
-  const getValue = async () => {
-    try {
-      const value = await AsyncStorage.getItem("HIGH_SCORE")
-      console.log("getValue", value)
-      setHighScore(value)
-    }
-    catch(e) {
-      console.log("getValue", e)
-    }
-  }
-  const setValue = async () => {
-    try {
-      AsyncStorage.setItem("HIGH_SCORE", score.toString())
-    }
-    catch(e) {
-      console.log("setValue", e)
-      AsyncStorage.setItem("HIGH_SCORE", score.toString())
-    }
-  }
-  useEffect(() => {
-    getValue()
-  })
   const {params} = route
-  const toggleSwitch = () => params.setVibro(!params.vibro)
+  const toggleSwitch = () => params.setVibro()
   return (
     <View style={styles.container} >
       <View style={styles.item} >

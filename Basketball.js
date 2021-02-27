@@ -1,4 +1,5 @@
 import React, {
+  useState,
   Component,
 } from 'react';
 import {
@@ -8,9 +9,6 @@ import {
   Vibration,
   Text,
   StatusBar,
-  TouchableWithoutFeedback,
-  Image,
-  Alert,
 } from 'react-native';
 
 import Ball from './components/Ball';
@@ -23,7 +21,6 @@ import Score from './components/Score';
 import Vector from './utils/Vector';
 import AsyncStorage from '@react-native-community/async-storage';
 import { constants } from './constants';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect } from 'react';
 
@@ -74,34 +71,15 @@ class Basketball extends Component {
       highScore: 0
     };
   }
-  getValue = async () => {
-    try {
-      const value = await AsyncStorage.getItem("HIGH_SCORE")
-      this.setState({ highScore: value })
-      console.log("getValue", value)
-    }
-    catch(e) {
-      console.log("getValue", e)
-    }
-  }
-
-  setValue = async (value) => {
-    try {
-      console.log("setValue", this.state.highScore)
-    this.state.score > this.state.highScore && await AsyncStorage.setItem("HIGH_SCORE", value)
-      console.log("setValue", this.state.highScore)
-    }
-    catch(e) {
-      console.log("setValue", e)
-      AsyncStorage.setItem("HIGH_SCORE", 3)
-    }
-  }
   componentDidMount() {
     this.interval = setInterval(this.update.bind(this), 1000 / 60);
-    this.getValue()
+    this.props.setScore(this.state.score)
+    this.props.setHighScore(this.state.score)
   }
 
   componentDidUpdate() {
+    this.props.setScore(this.state.score)
+    this.props.setHighScore(this.state.score)
   }
 
   componentWillUnmount() {
@@ -373,7 +351,7 @@ class Basketball extends Component {
       <>
       <View style={styles.container}>
         <View style={styles.score}>
-          <Text style={{ fontSize: 60 }}>{this.state.highScore} </Text>
+          <Text style={{ fontSize: 60 }}>{this.props.highScore} </Text>
         </View>
         <Score y={FLOOR_HEIGHT * 3} score={this.state.score} scored={this.state.scored} />
         <Hoop y={HOOP_Y} />
@@ -390,24 +368,71 @@ class Basketball extends Component {
         {this.renderNet(this.state.lifecycle !== LC_STARTING)}
         {this.renderFloor(this.state.vy > 0)}
         <Emoji y={NET_Y} scored={this.state.scored} />
-        <StatusBar hidden={true}/>
       </View>
       </>
     );
   }
 }
 function App({route}) {
+  const [score, setScore] = useState(0)
+  const [highScore, setHighScore] = useState(0)
+  const getValue = async () => {
+    try {
+      const value = await AsyncStorage.getItem("HIGH_SCORE")
+      console.log("getValue", value)
+      setHighScore(value)
+    }
+    catch(e) {
+      console.log("getValue", e)
+    }
+  }
+  const setValue = async () => {
+    try {
+      score > highScore && await AsyncStorage.setItem("HIGH_SCORE", score.toString())
+    }
+    catch(e) {
+      console.log("setValue", e)
+    }
+  }
   useEffect(() => {
-    console.log(route)
+    navigation.setOptions({title: Title()})
+    console.log(score, highScore)
   })
+  useEffect(() => {
+    getValue()
+    setValue()
+    navigation.setOptions({title: Title()})
+  }, [score])
+useEffect(() => {
+  getValue()
+  setValue()
+}, [])
   const navigation = useNavigation()
+  function Title() {
+    return (
+      <Text style={styles.title} >Your Highscore is {highScore} </Text>
+    )
+  }
   return (
-    <Basketball navigation={navigation} vibro={route.params.vibro} />
+    <>
+    <Basketball navigation={navigation} 
+    vibro={route.params.vibro}
+    setScore={(value) => setScore(value)}
+    setHighScore={(value) => score > highScore && setHighScore(value)}
+    highScore={highScore}
+     />
+     <StatusBar hidden={true}/>
+     </>
   )
 }
 
 
 const styles = StyleSheet.create({
+  title: {
+    fontSize: constants.MAX_HEIGHT * 0.03,
+    fontWeight: "600",
+    color: "#5993DE"
+  },
   container: {
     flex: 1,
   },

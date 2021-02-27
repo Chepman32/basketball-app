@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-community/async-storage'
 import { useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native'
@@ -5,6 +6,25 @@ import { constants } from './constants'
 
 export default function MainMenu(props) {
   const [vibro, setVibro] = useState(false)
+  const getValue = async () => {
+    try {
+      const value = await AsyncStorage.getItem("vibro")
+      console.log("getValue", value)
+      setVibro(!vibro)
+    }
+    catch(e) {
+      console.log("getValue", e)
+    }
+  }
+  const setValue = async () => {
+    try {
+      AsyncStorage.setItem("vibro", vibro)
+      console.log("setValue", vibro)
+    }
+    catch(e) {
+      console.log("setValue", e)
+    }
+  }
   const navigation = useNavigation()
   return (
     <View style={styles.container} >
@@ -19,7 +39,10 @@ export default function MainMenu(props) {
       <TouchableOpacity onPress={() => {
         navigation.navigate("Settings", {
           vibro,
-          setVibro
+          setVibro: () => {
+            setValue()
+            getValue()
+          }
         })
       }} style={styles.item} >
         <Text style={styles.text} >Settings</Text>
