@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native'
 import { constants } from './constants'
 
-export default function MainMenu(props) {
+export default function MainMenu() {
   const [vibro, setVibro] = useState(storedVibro)
   const [storedVibro, setStoredVibro] = useState()
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function MainMenu(props) {
 const styles = StyleSheet.create({
   container: {
     width: constants.MAX_WIDTH,
-    height: constants.MAX_HEIGHT,
+    height: constants.MAX_HEIGHT * 0.8,
     flex: 1,
     paddingVertical: constants.MAX_HEIGHT * 0.1,
     justifyContent: "space-around",
