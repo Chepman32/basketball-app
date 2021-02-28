@@ -1,18 +1,44 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import SwitchSelector from "react-native-switch-selector"
 import { View, Text, StyleSheet } from 'react-native'
 import { constants } from './constants'
 import AsyncStorage from '@react-native-community/async-storage'
 export default function Settings({route}) {
+  const {params} = route
   useEffect(() => {
-    console.log(params.vibro)
-  })
+    console.log("Settings", params.vibro)
+  }, [vibro])
+  const [vibro, setVibro] = useState(params.vibro)
+  const getValue = async () => {
+    try {
+      const value = await AsyncStorage.getItem("VIBRO")
+      console.log("getValue", value)
+      params.vibro !== value && await AsyncStorage.setItem("VIBRO", !vibro.toString())
+      params.setVibro(value)
+      setVibro(value)
+    }
+    catch(e) {
+      console.log("getValue", e)
+    }
+  }
+  const setValue = async () => {
+    try {
+      params.vibro !== vibro && await AsyncStorage.setItem("VIBRO", vibro)
+    }
+    catch(e) {
+      console.log("setValue", e)
+    }
+  }
   const options = [
     { label: "On", value: true },
     { label: "Off", value: false },
   ];
-  const {params} = route
-  const toggleSwitch = () => params.setVibro()
+  
+  const toggleSwitch = () => {
+    setVibro(!vibro)
+    params.setVibro(!vibro)
+      
+  }
   return (
     <View style={styles.container} >
       <View style={styles.item} >
@@ -22,7 +48,7 @@ export default function Settings({route}) {
         onPress={toggleSwitch}
   options={options}
   initial={params.vibro ? 0 : 1}
-  onPress={() => toggleSwitch()}
+  onPress={toggleSwitch}
 />
     </View>
     </View>

@@ -1,16 +1,23 @@
 import AsyncStorage from '@react-native-community/async-storage'
 import { useNavigation } from '@react-navigation/native'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native'
 import { constants } from './constants'
 
 export default function MainMenu(props) {
-  const [vibro, setVibro] = useState(false)
+  const [vibro, setVibro] = useState(storedVibro)
+  const [storedVibro, setStoredVibro] = useState()
+  useEffect(() => {
+    console.log("storedVibro", storedVibro)
+    getValue()
+  }, [])
   const getValue = async () => {
     try {
-      const value = await AsyncStorage.getItem("vibro")
+      let value = await AsyncStorage.getItem("VIBRO")
+      value = JSON.parse(value)
       console.log("getValue", value)
-      setVibro(!vibro)
+      setStoredVibro(value)
+      console.log("getValue", value)
     }
     catch(e) {
       console.log("getValue", e)
@@ -18,30 +25,32 @@ export default function MainMenu(props) {
   }
   const setValue = async () => {
     try {
-      AsyncStorage.setItem("vibro", vibro)
-      console.log("setValue", vibro)
+       await AsyncStorage.setItem("VIBRO", storedVibro.toString())
     }
     catch(e) {
       console.log("setValue", e)
     }
   }
+  useEffect(() => {
+    setValue()
+    getValue()
+  }, [storedVibro])
   const navigation = useNavigation()
   return (
     <View style={styles.container} >
       <TouchableOpacity onPress={() => {
-        props.hideModal && props.hideModal()
         navigation.navigate("Basketball", {
-          vibro,
+          vibro: storedVibro,
         })
       }} style={styles.item} >
         <Text style={styles.text} >Start Game</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => {
         navigation.navigate("Settings", {
-          vibro,
-          setVibro: () => {
+          vibro: JSON.parse(storedVibro),
+          setVibro: (value) => {
+            setStoredVibro(value)
             setValue()
-            getValue()
           }
         })
       }} style={styles.item} >
