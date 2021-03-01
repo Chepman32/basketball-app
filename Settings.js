@@ -5,30 +5,7 @@ import { constants } from './constants'
 import AsyncStorage from '@react-native-community/async-storage'
 export default function Settings({route}) {
   const {params} = route
-  useEffect(() => {
-    console.log("Settings", params.vibro)
-  }, [vibro])
   const [vibro, setVibro] = useState(params.vibro)
-  const getValue = async () => {
-    try {
-      const value = await AsyncStorage.getItem("VIBRO")
-      console.log("getValue", value)
-      params.vibro !== value && await AsyncStorage.setItem("VIBRO", !vibro.toString())
-      params.setVibro(value)
-      setVibro(value)
-    }
-    catch(e) {
-      console.log("getValue", e)
-    }
-  }
-  const setValue = async () => {
-    try {
-      params.vibro !== vibro && await AsyncStorage.setItem("VIBRO", vibro)
-    }
-    catch(e) {
-      console.log("setValue", e)
-    }
-  }
   const options = [
     { label: "On", value: true },
     { label: "Off", value: false },

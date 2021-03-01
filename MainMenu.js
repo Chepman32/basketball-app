@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 import { useNavigation } from '@react-navigation/native'
 import React, { useState, useEffect } from 'react'
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { AdMobComponent } from './AdMobComponent'
 import { constants } from './constants'
 
 export default function MainMenu() {
@@ -37,6 +38,7 @@ export default function MainMenu() {
   }, [storedVibro])
   const navigation = useNavigation()
   return (
+    <>
     <View style={styles.container} >
       <TouchableOpacity onPress={() => {
         navigation.navigate("Basketball", {
@@ -50,13 +52,14 @@ export default function MainMenu() {
           vibro: JSON.parse(storedVibro),
           setVibro: (value) => {
             setStoredVibro(value)
-            setValue()
           }
         })
       }} style={styles.item} >
         <Text style={styles.text} >Settings</Text>
       </TouchableOpacity>
     </View>
+    <AdMobComponent/>
+    </>
   )
 }
 const styles = StyleSheet.create({
