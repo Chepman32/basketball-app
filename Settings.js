@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import SwitchSelector from "react-native-switch-selector"
 import { View, Text, StyleSheet } from 'react-native'
 import { constants } from './constants'
-import AsyncStorage from '@react-native-community/async-storage'
 export default function Settings({route}) {
   const {params} = route
   const [vibro, setVibro] = useState(params.vibro)

@@ -19,7 +19,7 @@ import Emoji from './components/Emoji';
 import Score from './components/Score';
 
 import Vector from './utils/Vector';
-import AsyncStorage from '@react-native-community/async-storage';
+import { AsyncStorage } from 'react-native';
 import { constants } from './constants';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect } from 'react';
@@ -350,9 +350,6 @@ class Basketball extends Component {
     return (
       <>
       <View style={styles.container}>
-        <View style={styles.score}>
-          <Text style={{ fontSize: 60 }}>{this.props.highScore} </Text>
-        </View>
         <Score y={FLOOR_HEIGHT * 3} score={this.state.score} scored={this.state.scored} />
         <Hoop y={HOOP_Y} />
         {this.renderNet(this.state.lifecycle === LC_STARTING)}

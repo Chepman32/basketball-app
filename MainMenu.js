@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-community/async-storage'
+import { AsyncStorage } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
 import React, { useState, useEffect } from 'react'
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native'
